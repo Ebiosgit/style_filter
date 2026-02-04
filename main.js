@@ -144,14 +144,6 @@
         ? 'QR코드로 친구에게 공유'
         : 'QR코드 닫기';
     });
-
-    // Prevent zoom on double tap (iOS)
-    document.addEventListener('touchend', (e) => {
-      if (e.target.closest('.filter-btn, .btn, .qr-toggle')) {
-        e.preventDefault();
-        e.target.closest('.filter-btn, .btn, .qr-toggle').click();
-      }
-    }, { passive: false });
   }
 
   function debouncedApplyFilter() {

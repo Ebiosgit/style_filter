@@ -182,6 +182,43 @@ main {
   color: white;
 }
 
+/* Doodle Art Section */
+.doodle-section {
+  margin-bottom: 16px;
+}
+
+.doodle-toggle {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #ddd;
+  border-radius: 12px;
+  background: white;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  touch-action: manipulation;
+}
+
+.doodle-toggle:active {
+  transform: scale(0.98);
+}
+
+.doodle-toggle.active {
+  background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+  border-color: #ff9a9e;
+  color: white;
+}
+
+.doodle-options {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
 /* Controls */
 .controls {
   display: flex;

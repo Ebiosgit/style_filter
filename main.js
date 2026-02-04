@@ -30,7 +30,7 @@
   let filterDebounceTimer = null;
   let doodleEnabled = false;
   let sketchIntensity = 60;
-  let doodleDensity = 12;
+  let doodleDensity = 20;
   let doodleSeed = 1;
 
   // 2016 Style Filters
@@ -388,7 +388,8 @@
     for (let i = 0; i < count; i++) {
       const x = seededRandom() * w;
       const y = seededRandom() * h;
-      const size = 15 + seededRandom() * 30;
+      const baseSize = Math.min(w, h) * 0.07;
+      const size = baseSize * (0.6 + seededRandom() * 1.2);
       const fnIdx = Math.floor(seededRandom() * drawFns.length);
       const hue = Math.floor(seededRandom() * 360);
 
@@ -416,9 +417,9 @@
   }
 
   function drawHeart(c, s, hue) {
-    c.strokeStyle = `hsla(${hue}, 70%, 50%, 0.8)`;
-    c.fillStyle = `hsla(${hue}, 80%, 65%, 0.3)`;
-    c.lineWidth = 2;
+    c.strokeStyle = `hsla(${hue}, 70%, 38%, 0.9)`;
+    c.fillStyle = `hsla(${hue}, 80%, 65%, 0.4)`;
+    c.lineWidth = Math.max(2, s * 0.07);
     c.beginPath();
     const top = -s * 0.4;
     c.moveTo(0, s * 0.3);
@@ -433,9 +434,9 @@
   }
 
   function drawStar(c, s, hue) {
-    c.strokeStyle = `hsla(${hue}, 70%, 45%, 0.85)`;
-    c.fillStyle = `hsla(${hue}, 90%, 70%, 0.25)`;
-    c.lineWidth = 2;
+    c.strokeStyle = `hsla(${hue}, 70%, 38%, 0.95)`;
+    c.fillStyle = `hsla(${hue}, 90%, 70%, 0.4)`;
+    c.lineWidth = Math.max(2, s * 0.07);
     c.beginPath();
     for (let i = 0; i < 5; i++) {
       const angle = (i * 4 * Math.PI) / 5 - Math.PI / 2;
@@ -450,8 +451,8 @@
   }
 
   function drawFlower(c, s, hue) {
-    c.strokeStyle = `hsla(${hue}, 65%, 50%, 0.8)`;
-    c.lineWidth = 1.5;
+    c.strokeStyle = `hsla(${hue}, 65%, 38%, 0.9)`;
+    c.lineWidth = Math.max(1.5, s * 0.05);
     const petals = 5;
     for (let i = 0; i < petals; i++) {
       const angle = (i * 2 * Math.PI) / petals;
@@ -459,7 +460,7 @@
       const cx = Math.cos(angle) * s * 0.25;
       const cy = Math.sin(angle) * s * 0.25;
       c.ellipse(cx, cy, s * 0.2, s * 0.12, angle, 0, Math.PI * 2);
-      c.fillStyle = `hsla(${(hue + i * 20) % 360}, 80%, 75%, 0.3)`;
+      c.fillStyle = `hsla(${(hue + i * 20) % 360}, 80%, 75%, 0.4)`;
       c.fill();
       c.stroke();
     }
@@ -472,9 +473,9 @@
   }
 
   function drawCloud(c, s, hue) {
-    c.strokeStyle = 'rgba(80, 80, 80, 0.6)';
-    c.fillStyle = 'rgba(255, 255, 255, 0.2)';
-    c.lineWidth = 1.5;
+    c.strokeStyle = 'rgba(60, 60, 60, 0.9)';
+    c.fillStyle = 'rgba(255, 255, 255, 0.4)';
+    c.lineWidth = Math.max(1.5, s * 0.05);
     c.beginPath();
     c.arc(-s*0.2, 0, s*0.2 + (seededRandom()-0.5)*2, Math.PI, 0);
     c.arc(s*0.1, -s*0.05, s*0.25 + (seededRandom()-0.5)*2, Math.PI, 0);
@@ -485,8 +486,8 @@
   }
 
   function drawSparkle(c, s, hue) {
-    c.strokeStyle = `hsla(${hue}, 80%, 55%, 0.85)`;
-    c.lineWidth = 2;
+    c.strokeStyle = `hsla(${hue}, 80%, 40%, 0.95)`;
+    c.lineWidth = Math.max(2, s * 0.07);
     const r = s * 0.4;
     for (let i = 0; i < 4; i++) {
       const angle = (i * Math.PI) / 4;
@@ -499,16 +500,16 @@
   }
 
   function drawArrow(c, s, hue) {
-    c.strokeStyle = `hsla(${hue}, 60%, 45%, 0.75)`;
-    c.lineWidth = 2;
+    c.strokeStyle = `hsla(${hue}, 60%, 35%, 0.9)`;
+    c.lineWidth = Math.max(2, s * 0.07);
     const len = s * 0.6;
     wobblyLine(c, [[0, 0], [len, 0]]);
     wobblyLine(c, [[len * 0.65, -len * 0.25], [len, 0], [len * 0.65, len * 0.25]]);
   }
 
   function drawSpiral(c, s, hue) {
-    c.strokeStyle = `hsla(${hue}, 70%, 50%, 0.7)`;
-    c.lineWidth = 1.5;
+    c.strokeStyle = `hsla(${hue}, 70%, 38%, 0.9)`;
+    c.lineWidth = Math.max(1.5, s * 0.05);
     c.beginPath();
     for (let t = 0; t < 12; t += 0.3) {
       const r = t * s * 0.03;
@@ -524,9 +525,9 @@
   // 2016 SNS doodles
   // ==========================================
   function drawMusicNote(c, s, hue) {
-    c.strokeStyle = `hsla(${hue}, 70%, 45%, 0.8)`;
+    c.strokeStyle = `hsla(${hue}, 70%, 35%, 0.9)`;
     c.fillStyle = `hsla(${hue}, 80%, 55%, 0.6)`;
-    c.lineWidth = 2;
+    c.lineWidth = Math.max(2, s * 0.07);
     // Note head (filled ellipse)
     c.beginPath();
     c.ellipse(0, s * 0.3, s * 0.15, s * 0.1, -0.3, 0, Math.PI * 2);
@@ -546,9 +547,9 @@
   }
 
   function drawCrown(c, s, hue) {
-    c.strokeStyle = `hsla(45, 80%, 45%, 0.85)`;
-    c.fillStyle = `hsla(50, 90%, 65%, 0.35)`;
-    c.lineWidth = 2;
+    c.strokeStyle = `hsla(45, 80%, 35%, 0.95)`;
+    c.fillStyle = `hsla(50, 90%, 65%, 0.45)`;
+    c.lineWidth = Math.max(2, s * 0.07);
     var h2 = s * 0.35;
     var w2 = s * 0.45;
     var pts = [
@@ -578,14 +579,14 @@
   }
 
   function drawRainbow(c, s, hue) {
-    c.lineWidth = 2;
+    c.lineWidth = Math.max(2, s * 0.07);
     var colors = [
-      'hsla(0, 80%, 55%, 0.6)',
-      'hsla(30, 80%, 55%, 0.6)',
-      'hsla(55, 80%, 55%, 0.6)',
-      'hsla(120, 70%, 45%, 0.6)',
-      'hsla(210, 70%, 55%, 0.6)',
-      'hsla(270, 70%, 55%, 0.6)'
+      'hsla(0, 80%, 40%, 0.9)',
+      'hsla(30, 80%, 40%, 0.9)',
+      'hsla(55, 80%, 40%, 0.9)',
+      'hsla(120, 70%, 35%, 0.9)',
+      'hsla(210, 70%, 40%, 0.9)',
+      'hsla(270, 70%, 40%, 0.9)'
     ];
     for (var i = 0; i < colors.length; i++) {
       c.strokeStyle = colors[i];
@@ -597,9 +598,9 @@
   }
 
   function drawLightning(c, s, hue) {
-    c.strokeStyle = `hsla(50, 90%, 50%, 0.85)`;
-    c.fillStyle = `hsla(50, 95%, 65%, 0.35)`;
-    c.lineWidth = 2;
+    c.strokeStyle = `hsla(50, 90%, 38%, 0.95)`;
+    c.fillStyle = `hsla(50, 95%, 65%, 0.45)`;
+    c.lineWidth = Math.max(2, s * 0.07);
     var pts = [
       [s * 0.05, -s * 0.5],
       [-s * 0.1 + (seededRandom() - 0.5) * 2, -s * 0.1],
@@ -626,9 +627,9 @@
   }
 
   function drawMoon(c, s, hue) {
-    c.strokeStyle = `hsla(45, 60%, 45%, 0.8)`;
-    c.fillStyle = `hsla(50, 80%, 70%, 0.3)`;
-    c.lineWidth = 1.5;
+    c.strokeStyle = `hsla(45, 60%, 35%, 0.9)`;
+    c.fillStyle = `hsla(50, 80%, 70%, 0.4)`;
+    c.lineWidth = Math.max(1.5, s * 0.05);
     var r = s * 0.4;
     // Outer circle
     c.beginPath();
@@ -649,36 +650,36 @@
   }
 
   function drawButterfly(c, s, hue) {
-    c.strokeStyle = `hsla(${hue}, 70%, 45%, 0.8)`;
-    c.lineWidth = 1.5;
+    c.strokeStyle = `hsla(${hue}, 70%, 35%, 0.9)`;
+    c.lineWidth = Math.max(1.5, s * 0.05);
     // Left wings
     c.beginPath();
-    c.fillStyle = `hsla(${hue}, 75%, 65%, 0.3)`;
+    c.fillStyle = `hsla(${hue}, 75%, 65%, 0.4)`;
     c.ellipse(-s * 0.2, -s * 0.12, s * 0.22, s * 0.15, -0.4 + (seededRandom() - 0.5) * 0.2, 0, Math.PI * 2);
     c.fill();
     c.stroke();
     c.beginPath();
-    c.fillStyle = `hsla(${(hue + 30) % 360}, 75%, 65%, 0.3)`;
+    c.fillStyle = `hsla(${(hue + 30) % 360}, 75%, 65%, 0.4)`;
     c.ellipse(-s * 0.15, s * 0.1, s * 0.16, s * 0.1, -0.2 + (seededRandom() - 0.5) * 0.2, 0, Math.PI * 2);
     c.fill();
     c.stroke();
     // Right wings (mirror)
     c.beginPath();
-    c.fillStyle = `hsla(${hue}, 75%, 65%, 0.3)`;
+    c.fillStyle = `hsla(${hue}, 75%, 65%, 0.4)`;
     c.ellipse(s * 0.2, -s * 0.12, s * 0.22, s * 0.15, 0.4 + (seededRandom() - 0.5) * 0.2, 0, Math.PI * 2);
     c.fill();
     c.stroke();
     c.beginPath();
-    c.fillStyle = `hsla(${(hue + 30) % 360}, 75%, 65%, 0.3)`;
+    c.fillStyle = `hsla(${(hue + 30) % 360}, 75%, 65%, 0.4)`;
     c.ellipse(s * 0.15, s * 0.1, s * 0.16, s * 0.1, 0.2 + (seededRandom() - 0.5) * 0.2, 0, Math.PI * 2);
     c.fill();
     c.stroke();
     // Body
-    c.strokeStyle = `hsla(${hue}, 50%, 35%, 0.8)`;
-    c.lineWidth = 2;
+    c.strokeStyle = `hsla(${hue}, 50%, 30%, 0.9)`;
+    c.lineWidth = Math.max(2, s * 0.07);
     wobblyLine(c, [[0, -s * 0.25], [0, s * 0.2]]);
     // Antennae
-    c.lineWidth = 1;
+    c.lineWidth = Math.max(1, s * 0.035);
     wobblyLine(c, [[0, -s * 0.25], [-s * 0.12, -s * 0.4 + (seededRandom() - 0.5) * 2]]);
     wobblyLine(c, [[0, -s * 0.25], [s * 0.12, -s * 0.4 + (seededRandom() - 0.5) * 2]]);
   }
@@ -686,9 +687,9 @@
   function drawSpeechBubble(c, s, hue) {
     var texts = ['OMG', 'LOL', 'YOLO', ':)', '<3', 'WOW', 'HI', 'XD', '#TBT', 'BFF'];
     var text = texts[Math.floor(seededRandom() * texts.length)];
-    c.strokeStyle = `hsla(${hue}, 50%, 40%, 0.75)`;
+    c.strokeStyle = `hsla(${hue}, 50%, 35%, 0.9)`;
     c.fillStyle = 'rgba(255, 255, 255, 0.55)';
-    c.lineWidth = 1.5;
+    c.lineWidth = Math.max(1.5, s * 0.05);
     // Rounded bubble
     var bw = s * 0.7;
     var bh = s * 0.4;
@@ -713,7 +714,7 @@
     c.lineTo(s * 0.08 + (seededRandom() - 0.5) * 2, bh / 2);
     c.stroke();
     // Text
-    c.fillStyle = `hsla(${hue}, 60%, 40%, 0.85)`;
+    c.fillStyle = `hsla(${hue}, 60%, 35%, 0.95)`;
     c.font = `bold ${s * 0.22}px sans-serif`;
     c.textAlign = 'center';
     c.textBaseline = 'middle';
@@ -724,9 +725,9 @@
   // Cute character doodles
   // ==========================================
   function drawCatFace(c, s, hue) {
-    c.strokeStyle = `hsla(${hue}, 50%, 40%, 0.8)`;
-    c.fillStyle = `hsla(${hue}, 40%, 80%, 0.3)`;
-    c.lineWidth = 1.5;
+    c.strokeStyle = `hsla(${hue}, 50%, 35%, 0.9)`;
+    c.fillStyle = `hsla(${hue}, 40%, 80%, 0.4)`;
+    c.lineWidth = Math.max(1.5, s * 0.05);
     var r = s * 0.3;
     // Face
     c.beginPath();
@@ -769,7 +770,7 @@
     c.lineTo(r * 0.15, r * 0.35 + (seededRandom() - 0.5) * 1);
     c.stroke();
     // Whiskers
-    c.lineWidth = 1;
+    c.lineWidth = Math.max(1, s * 0.035);
     wobblyLine(c, [[-r * 0.2, r * 0.15], [-r * 0.8, r * 0.05]]);
     wobblyLine(c, [[-r * 0.2, r * 0.25], [-r * 0.8, r * 0.3]]);
     wobblyLine(c, [[r * 0.2, r * 0.15], [r * 0.8, r * 0.05]]);
@@ -777,9 +778,9 @@
   }
 
   function drawBearFace(c, s, hue) {
-    c.strokeStyle = `hsla(30, 45%, 35%, 0.8)`;
-    c.fillStyle = `hsla(30, 40%, 65%, 0.3)`;
-    c.lineWidth = 1.5;
+    c.strokeStyle = `hsla(30, 45%, 30%, 0.9)`;
+    c.fillStyle = `hsla(30, 40%, 65%, 0.4)`;
+    c.lineWidth = Math.max(1.5, s * 0.05);
     var r = s * 0.32;
     // Ears
     c.beginPath();
@@ -826,9 +827,9 @@
   }
 
   function drawBunnyFace(c, s, hue) {
-    c.strokeStyle = `hsla(330, 40%, 50%, 0.8)`;
-    c.fillStyle = `hsla(330, 30%, 85%, 0.3)`;
-    c.lineWidth = 1.5;
+    c.strokeStyle = `hsla(330, 40%, 38%, 0.9)`;
+    c.fillStyle = `hsla(330, 30%, 85%, 0.4)`;
+    c.lineWidth = Math.max(1.5, s * 0.05);
     var r = s * 0.28;
     // Long ears
     c.beginPath();
@@ -837,22 +838,22 @@
     c.fill();
     c.stroke();
     // Inner ear
-    c.fillStyle = `hsla(350, 60%, 75%, 0.35)`;
+    c.fillStyle = `hsla(350, 60%, 75%, 0.45)`;
     c.beginPath();
     c.ellipse(-r * 0.35, -r * 1.4, r * 0.1, r * 0.4, -0.15, 0, Math.PI * 2);
     c.fill();
-    c.fillStyle = `hsla(330, 30%, 85%, 0.3)`;
+    c.fillStyle = `hsla(330, 30%, 85%, 0.4)`;
     c.beginPath();
     c.ellipse(r * 0.35, -r * 1.4, r * 0.2, r * 0.6 + (seededRandom() - 0.5) * 2,
               0.15 + (seededRandom() - 0.5) * 0.2, 0, Math.PI * 2);
     c.fill();
     c.stroke();
-    c.fillStyle = `hsla(350, 60%, 75%, 0.35)`;
+    c.fillStyle = `hsla(350, 60%, 75%, 0.45)`;
     c.beginPath();
     c.ellipse(r * 0.35, -r * 1.4, r * 0.1, r * 0.4, 0.15, 0, Math.PI * 2);
     c.fill();
     // Face
-    c.fillStyle = `hsla(330, 30%, 85%, 0.3)`;
+    c.fillStyle = `hsla(330, 30%, 85%, 0.4)`;
     c.beginPath();
     c.arc(0, 0, r + (seededRandom() - 0.5) * 1.5, 0, Math.PI * 2);
     c.fill();
@@ -887,9 +888,9 @@
   }
 
   function drawDiamond(c, s, hue) {
-    c.strokeStyle = `hsla(${hue}, 70%, 50%, 0.85)`;
-    c.fillStyle = `hsla(${hue}, 80%, 75%, 0.25)`;
-    c.lineWidth = 2;
+    c.strokeStyle = `hsla(${hue}, 70%, 38%, 0.95)`;
+    c.fillStyle = `hsla(${hue}, 80%, 75%, 0.4)`;
+    c.lineWidth = Math.max(2, s * 0.07);
     var w2 = s * 0.35;
     var h2 = s * 0.5;
     var mid = s * 0.15;
@@ -903,8 +904,8 @@
     c.fill();
     c.stroke();
     // Inner facet lines
-    c.lineWidth = 1;
-    c.strokeStyle = `hsla(${hue}, 60%, 55%, 0.5)`;
+    c.lineWidth = Math.max(1, s * 0.035);
+    c.strokeStyle = `hsla(${hue}, 60%, 45%, 0.6)`;
     c.beginPath();
     c.moveTo(-w2, -mid);
     c.lineTo(w2, -mid);
@@ -977,9 +978,9 @@
     grainSlider.value = 15;
     doodleEnabled = false;
     sketchIntensity = 60;
-    doodleDensity = 12;
+    doodleDensity = 20;
     sketchSlider.value = 60;
-    doodleDensitySlider.value = 12;
+    doodleDensitySlider.value = 20;
     doodleToggle.classList.remove('active');
     doodleOptions.classList.add('hidden');
     document.querySelectorAll('.doodle-btn').forEach(btn => btn.classList.add('active'));

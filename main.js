@@ -44,10 +44,6 @@
       sepia: 0.02, warmth: 25, fadeBlack: 10, vignette: 0.25,
       tint: { r: 247, g: 176, b: 152, a: 0.1 }
     },
-    lofi: {
-      brightness: 1.0, contrast: 1.5, saturate: 1.3,
-      sepia: 0, warmth: 0, fadeBlack: 0, vignette: 0.6
-    },
     earlybird: {
       brightness: 1.0, contrast: 0.9, saturate: 0.9,
       sepia: 0.25, warmth: 20, fadeBlack: 30, vignette: 0.5

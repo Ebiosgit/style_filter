@@ -1,14 +1,74 @@
 <!doctype html>
-<html lang="en">
+<html lang="ko">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hello World</title>
+  <title>2016 Filter - 그때 그 감성으로</title>
+  <meta name="description" content="2026 is the new 2016. 추억의 2016 감성 필터로 사진을 변환하세요." />
+  <meta property="og:title" content="2016 Filter - 그때 그 감성으로" />
+  <meta property="og:description" content="2026 is the new 2016. 추억의 2016 감성 필터" />
+  <meta property="og:type" content="website" />
   <link href='/style.css' rel='stylesheet'>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
-  <h1>Hello, world!</h1>
-  <button onclick="console.log('hello');">Press me</button>
+  <div class="container">
+    <header>
+      <h1>2016 Filter</h1>
+      <p class="tagline">2026 is the new 2016</p>
+    </header>
+
+    <main>
+      <div class="upload-area" id="uploadArea">
+        <input type="file" id="fileInput" accept="image/*" hidden />
+        <div class="upload-content">
+          <div class="upload-icon">📷</div>
+          <p>사진을 드래그하거나<br>클릭해서 업로드</p>
+        </div>
+      </div>
+
+      <div class="editor hidden" id="editor">
+        <div class="canvas-wrapper">
+          <canvas id="canvas"></canvas>
+        </div>
+
+        <div class="filters">
+          <h3>필터 선택</h3>
+          <div class="filter-list" id="filterList">
+            <button class="filter-btn active" data-filter="valencia">Valencia</button>
+            <button class="filter-btn" data-filter="nashville">Nashville</button>
+            <button class="filter-btn" data-filter="lofi">Lo-Fi</button>
+            <button class="filter-btn" data-filter="earlybird">Earlybird</button>
+            <button class="filter-btn" data-filter="vsco">VSCO</button>
+          </div>
+        </div>
+
+        <div class="controls">
+          <label class="control-item">
+            <span>필터 강도</span>
+            <input type="range" id="intensity" min="0" max="100" value="80" />
+          </label>
+          <label class="control-item">
+            <span>그레인</span>
+            <input type="range" id="grain" min="0" max="50" value="15" />
+          </label>
+        </div>
+
+        <div class="actions">
+          <button class="btn btn-secondary" id="resetBtn">다시 선택</button>
+          <button class="btn btn-primary" id="downloadBtn">저장하기</button>
+          <button class="btn btn-share" id="shareBtn">공유하기</button>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <p>made with nostalgia ✨</p>
+    </footer>
+  </div>
+
   <script defer type="text/javascript" src="/main.js"></script>
 </body>
 </html>

@@ -2,6 +2,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
 }
 
 :root {
@@ -11,40 +12,52 @@
   --dark: #242424;
   --light: #faf3e0;
   --card-bg: rgba(255, 255, 255, 0.95);
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  overflow-x: hidden;
 }
 
 body {
   font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
   background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
   min-height: 100vh;
+  min-height: 100dvh;
   color: var(--dark);
+  overflow-x: hidden;
 }
 
 .container {
   max-width: 480px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 16px;
+  padding-top: calc(16px + var(--safe-top));
+  padding-bottom: calc(16px + var(--safe-bottom));
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
 }
 
 header {
   text-align: center;
-  padding: 30px 0 20px;
+  padding: 24px 0 16px;
 }
 
 header h1 {
-  font-size: 2.5rem;
+  font-size: 2.2rem;
   font-weight: 700;
   color: var(--dark);
   text-shadow: 2px 2px 0 rgba(255, 255, 255, 0.5);
 }
 
 .tagline {
-  font-size: 1rem;
+  font-size: 0.95rem;
   color: var(--secondary);
-  margin-top: 8px;
+  margin-top: 6px;
   font-style: italic;
 }
 
@@ -52,22 +65,25 @@ main {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
 }
 
+/* Upload Area */
 .upload-area {
   background: var(--card-bg);
   border: 3px dashed var(--secondary);
   border-radius: 20px;
-  padding: 60px 20px;
+  padding: 50px 20px;
   text-align: center;
   cursor: pointer;
   transition: all 0.3s ease;
+  -webkit-touch-callout: none;
+  user-select: none;
 }
 
-.upload-area:hover {
-  border-color: var(--primary);
-  transform: scale(1.02);
+.upload-area:active {
+  transform: scale(0.98);
+  background: rgba(232, 168, 124, 0.15);
 }
 
 .upload-area.dragover {
@@ -76,8 +92,8 @@ main {
 }
 
 .upload-icon {
-  font-size: 4rem;
-  margin-bottom: 15px;
+  font-size: 3.5rem;
+  margin-bottom: 12px;
 }
 
 .upload-content p {
@@ -86,14 +102,20 @@ main {
   line-height: 1.6;
 }
 
+.upload-sub {
+  font-size: 0.8rem;
+  color: #999;
+}
+
 .hidden {
   display: none !important;
 }
 
+/* Editor */
 .editor {
   background: var(--card-bg);
   border-radius: 20px;
-  padding: 20px;
+  padding: 16px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
 }
 
@@ -103,7 +125,7 @@ main {
   border-radius: 12px;
   overflow: hidden;
   background: #f0f0f0;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 #canvas {
@@ -112,14 +134,15 @@ main {
   height: auto;
 }
 
+/* Filters */
 .filters {
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 .filters h3 {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: #666;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .filter-list {
@@ -128,11 +151,17 @@ main {
   overflow-x: auto;
   padding-bottom: 8px;
   -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.filter-list::-webkit-scrollbar {
+  display: none;
 }
 
 .filter-btn {
   flex-shrink: 0;
-  padding: 10px 16px;
+  padding: 10px 18px;
   border: 2px solid #ddd;
   border-radius: 20px;
   background: white;
@@ -140,10 +169,11 @@ main {
   font-family: inherit;
   cursor: pointer;
   transition: all 0.2s ease;
+  touch-action: manipulation;
 }
 
-.filter-btn:hover {
-  border-color: var(--secondary);
+.filter-btn:active {
+  transform: scale(0.95);
 }
 
 .filter-btn.active {
@@ -152,21 +182,22 @@ main {
   color: white;
 }
 
+/* Controls */
 .controls {
   display: flex;
   flex-direction: column;
-  gap: 15px;
-  margin-bottom: 20px;
+  gap: 14px;
+  margin-bottom: 16px;
 }
 
 .control-item {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 .control-item span {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: #666;
 }
 
@@ -181,29 +212,47 @@ main {
 
 .control-item input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   background: var(--secondary);
   cursor: pointer;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
+.control-item input[type="range"]::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--secondary);
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* Action Buttons */
 .actions {
-  display: flex;
-  gap: 10px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
 }
 
 .btn {
-  flex: 1;
-  padding: 14px 20px;
+  padding: 14px 10px;
   border: none;
   border-radius: 12px;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-family: inherit;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
+  touch-action: manipulation;
+  white-space: nowrap;
+}
+
+.btn:active {
+  transform: scale(0.95);
+  opacity: 0.9;
 }
 
 .btn-secondary {
@@ -211,18 +260,9 @@ main {
   color: #666;
 }
 
-.btn-secondary:hover {
-  background: #ddd;
-}
-
 .btn-primary {
   background: var(--primary);
   color: white;
-}
-
-.btn-primary:hover {
-  background: #d99a6c;
-  transform: translateY(-2px);
 }
 
 .btn-share {
@@ -230,16 +270,62 @@ main {
   color: white;
 }
 
-.btn-share:hover {
-  background: #359e90;
-  transform: translateY(-2px);
+/* QR Code Section */
+.qr-section {
+  text-align: center;
 }
 
+.qr-toggle {
+  background: none;
+  border: 2px solid rgba(195, 141, 158, 0.4);
+  border-radius: 12px;
+  padding: 12px 24px;
+  font-family: inherit;
+  font-size: 0.85rem;
+  color: var(--secondary);
+  cursor: pointer;
+  width: 100%;
+  transition: all 0.2s ease;
+  touch-action: manipulation;
+}
+
+.qr-toggle:active {
+  transform: scale(0.98);
+}
+
+.qr-content {
+  background: var(--card-bg);
+  border-radius: 16px;
+  padding: 24px;
+  margin-top: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.qr-image {
+  width: 180px;
+  height: 180px;
+  margin: 0 auto 12px;
+  display: block;
+}
+
+.qr-url {
+  font-size: 0.8rem;
+  color: var(--secondary);
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.qr-hint {
+  font-size: 0.75rem;
+  color: #999;
+}
+
+/* Footer */
 footer {
   text-align: center;
-  padding: 30px 0 20px;
-  color: #888;
-  font-size: 0.85rem;
+  padding: 24px 0 16px;
+  color: #aaa;
+  font-size: 0.8rem;
 }
 
 /* Loading state */
@@ -260,20 +346,148 @@ footer {
   border-top-color: var(--secondary);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
+  z-index: 100;
 }
 
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
 
-/* Responsive */
-@media (max-width: 360px) {
+/* ====== Responsive Breakpoints ====== */
+
+/* Small phones (iPhone SE, Galaxy S series) */
+@media (max-width: 375px) {
   header h1 {
-    font-size: 2rem;
+    font-size: 1.8rem;
+  }
+
+  .tagline {
+    font-size: 0.85rem;
+  }
+
+  .upload-area {
+    padding: 40px 16px;
+  }
+
+  .upload-icon {
+    font-size: 2.8rem;
   }
 
   .filter-btn {
-    padding: 8px 12px;
+    padding: 8px 14px;
     font-size: 0.8rem;
+  }
+
+  .btn {
+    padding: 12px 8px;
+    font-size: 0.82rem;
+  }
+
+  .editor {
+    padding: 12px;
+  }
+
+  .qr-image {
+    width: 150px;
+    height: 150px;
+  }
+}
+
+/* Medium phones (iPhone 12/13/14, Pixel) */
+@media (min-width: 376px) and (max-width: 430px) {
+  .container {
+    padding: 16px;
+  }
+}
+
+/* Large phones & small tablets */
+@media (min-width: 431px) and (max-width: 768px) {
+  .container {
+    max-width: 500px;
+    padding: 20px;
+  }
+
+  .actions {
+    gap: 10px;
+  }
+}
+
+/* Tablets & Desktop */
+@media (min-width: 769px) {
+  .container {
+    max-width: 520px;
+    padding: 24px;
+  }
+
+  header h1 {
+    font-size: 2.5rem;
+  }
+
+  .upload-area {
+    padding: 60px 20px;
+  }
+
+  .upload-area:hover {
+    border-color: var(--primary);
+    transform: scale(1.02);
+  }
+
+  .filter-btn:hover {
+    border-color: var(--secondary);
+  }
+
+  .btn:hover {
+    transform: translateY(-2px);
+  }
+
+  .qr-toggle:hover {
+    border-color: var(--secondary);
+    background: rgba(195, 141, 158, 0.08);
+  }
+}
+
+/* Landscape orientation on phones */
+@media (max-height: 500px) and (orientation: landscape) {
+  header {
+    padding: 8px 0;
+  }
+
+  header h1 {
+    font-size: 1.6rem;
+  }
+
+  .tagline {
+    display: none;
+  }
+
+  .upload-area {
+    padding: 24px 16px;
+  }
+
+  .upload-icon {
+    font-size: 2rem;
+    margin-bottom: 4px;
+  }
+
+  .editor {
+    padding: 10px;
+  }
+
+  .canvas-wrapper {
+    margin-bottom: 10px;
+  }
+
+  .controls {
+    flex-direction: row;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+
+  .control-item {
+    flex: 1;
+  }
+
+  footer {
+    padding: 8px 0;
   }
 }

@@ -2,12 +2,15 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>2016 Filter - 그때 그 감성으로</title>
   <meta name="description" content="2026 is the new 2016. 추억의 2016 감성 필터로 사진을 변환하세요." />
   <meta property="og:title" content="2016 Filter - 그때 그 감성으로" />
   <meta property="og:description" content="2026 is the new 2016. 추억의 2016 감성 필터" />
   <meta property="og:type" content="website" />
+  <meta name="theme-color" content="#fcb69f" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link href='/style.css' rel='stylesheet'>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -25,7 +28,7 @@
         <input type="file" id="fileInput" accept="image/*" hidden />
         <div class="upload-content">
           <div class="upload-icon">📷</div>
-          <p>사진을 드래그하거나<br>클릭해서 업로드</p>
+          <p>사진을 탭해서 업로드<br><span class="upload-sub">갤러리 또는 카메라</span></p>
         </div>
       </div>
 
@@ -58,14 +61,23 @@
 
         <div class="actions">
           <button class="btn btn-secondary" id="resetBtn">다시 선택</button>
-          <button class="btn btn-primary" id="downloadBtn">저장하기</button>
-          <button class="btn btn-share" id="shareBtn">공유하기</button>
+          <button class="btn btn-primary" id="downloadBtn">저장</button>
+          <button class="btn btn-share" id="shareBtn">공유</button>
+        </div>
+      </div>
+
+      <div class="qr-section" id="qrSection">
+        <button class="qr-toggle" id="qrToggle">QR코드로 친구에게 공유</button>
+        <div class="qr-content hidden" id="qrContent">
+          <img src="qr.svg" alt="QR Code" class="qr-image" />
+          <p class="qr-url">ebiosgit.github.io/style_filter</p>
+          <p class="qr-hint">카메라로 스캔하면 바로 접속!</p>
         </div>
       </div>
     </main>
 
     <footer>
-      <p>made with nostalgia ✨</p>
+      <p>made with nostalgia</p>
     </footer>
   </div>
 

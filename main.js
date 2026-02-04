@@ -357,7 +357,9 @@
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
 
-    const drawFns = [drawHeart, drawStar, drawFlower, drawCloud, drawSparkle, drawArrow, drawSpiral];
+    const drawFns = [drawHeart, drawStar, drawFlower, drawCloud, drawSparkle, drawArrow, drawSpiral,
+      drawMusicNote, drawCrown, drawRainbow, drawLightning, drawMoon, drawButterfly, drawSpeechBubble,
+      drawCatFace, drawBearFace, drawBunnyFace, drawDiamond];
 
     for (let i = 0; i < count; i++) {
       const x = seededRandom() * w;
@@ -491,6 +493,407 @@
       if (t === 0) c.moveTo(x, y);
       else c.lineTo(x, y);
     }
+    c.stroke();
+  }
+
+  // ==========================================
+  // 2016 SNS doodles
+  // ==========================================
+  function drawMusicNote(c, s, hue) {
+    c.strokeStyle = `hsla(${hue}, 70%, 45%, 0.8)`;
+    c.fillStyle = `hsla(${hue}, 80%, 55%, 0.6)`;
+    c.lineWidth = 2;
+    // Note head (filled ellipse)
+    c.beginPath();
+    c.ellipse(0, s * 0.3, s * 0.15, s * 0.1, -0.3, 0, Math.PI * 2);
+    c.fill();
+    c.stroke();
+    // Stem
+    var w = (seededRandom() - 0.5) * 1.5;
+    c.beginPath();
+    c.moveTo(s * 0.12 + w, s * 0.25);
+    c.lineTo(s * 0.12 + w, -s * 0.35 + (seededRandom() - 0.5) * 2);
+    c.stroke();
+    // Flag
+    c.beginPath();
+    c.moveTo(s * 0.12 + w, -s * 0.35);
+    c.quadraticCurveTo(s * 0.35 + (seededRandom() - 0.5) * 2, -s * 0.2, s * 0.12, -s * 0.1);
+    c.stroke();
+  }
+
+  function drawCrown(c, s, hue) {
+    c.strokeStyle = `hsla(45, 80%, 45%, 0.85)`;
+    c.fillStyle = `hsla(50, 90%, 65%, 0.35)`;
+    c.lineWidth = 2;
+    var h2 = s * 0.35;
+    var w2 = s * 0.45;
+    var pts = [
+      [-w2, h2], [-w2, -h2 * 0.2 + (seededRandom() - 0.5) * 2],
+      [-w2 * 0.5, h2 * 0.3 + (seededRandom() - 0.5) * 2],
+      [0, -h2 + (seededRandom() - 0.5) * 2],
+      [w2 * 0.5, h2 * 0.3 + (seededRandom() - 0.5) * 2],
+      [w2, -h2 * 0.2 + (seededRandom() - 0.5) * 2],
+      [w2, h2]
+    ];
+    c.beginPath();
+    c.moveTo(pts[0][0], pts[0][1]);
+    for (var i = 1; i < pts.length; i++) {
+      c.lineTo(pts[i][0] + (seededRandom() - 0.5) * 1.5, pts[i][1]);
+    }
+    c.closePath();
+    c.fill();
+    c.stroke();
+    // Jewels on tips
+    var tips = [1, 3, 5];
+    for (var j = 0; j < tips.length; j++) {
+      c.beginPath();
+      c.arc(pts[tips[j]][0], pts[tips[j]][1], s * 0.04, 0, Math.PI * 2);
+      c.fillStyle = `hsla(${(hue + j * 90) % 360}, 80%, 60%, 0.7)`;
+      c.fill();
+    }
+  }
+
+  function drawRainbow(c, s, hue) {
+    c.lineWidth = 2;
+    var colors = [
+      'hsla(0, 80%, 55%, 0.6)',
+      'hsla(30, 80%, 55%, 0.6)',
+      'hsla(55, 80%, 55%, 0.6)',
+      'hsla(120, 70%, 45%, 0.6)',
+      'hsla(210, 70%, 55%, 0.6)',
+      'hsla(270, 70%, 55%, 0.6)'
+    ];
+    for (var i = 0; i < colors.length; i++) {
+      c.strokeStyle = colors[i];
+      c.beginPath();
+      var r = s * 0.5 - i * s * 0.06;
+      c.arc(0, s * 0.15, r + (seededRandom() - 0.5) * 1.5, Math.PI, 0);
+      c.stroke();
+    }
+  }
+
+  function drawLightning(c, s, hue) {
+    c.strokeStyle = `hsla(50, 90%, 50%, 0.85)`;
+    c.fillStyle = `hsla(50, 95%, 65%, 0.35)`;
+    c.lineWidth = 2;
+    var pts = [
+      [s * 0.05, -s * 0.5],
+      [-s * 0.1 + (seededRandom() - 0.5) * 2, -s * 0.1],
+      [s * 0.08 + (seededRandom() - 0.5) * 2, -s * 0.05],
+      [-s * 0.05 + (seededRandom() - 0.5) * 2, s * 0.5]
+    ];
+    c.beginPath();
+    c.moveTo(pts[0][0], pts[0][1]);
+    for (var i = 1; i < pts.length; i++) {
+      c.lineTo(pts[i][0], pts[i][1]);
+    }
+    c.stroke();
+    // Second stroke slightly offset for thickness feel
+    c.beginPath();
+    c.moveTo(pts[0][0] + s * 0.06, pts[0][1]);
+    c.lineTo(pts[1][0] + s * 0.08, pts[1][1]);
+    c.lineTo(pts[2][0] + s * 0.1, pts[2][1]);
+    c.lineTo(pts[3][0] + s * 0.04, pts[3][1]);
+    c.lineTo(pts[2][0], pts[2][1]);
+    c.lineTo(pts[1][0] + s * 0.02, pts[1][1]);
+    c.closePath();
+    c.fill();
+    c.stroke();
+  }
+
+  function drawMoon(c, s, hue) {
+    c.strokeStyle = `hsla(45, 60%, 45%, 0.8)`;
+    c.fillStyle = `hsla(50, 80%, 70%, 0.3)`;
+    c.lineWidth = 1.5;
+    var r = s * 0.4;
+    // Outer circle
+    c.beginPath();
+    c.arc(0, 0, r + (seededRandom() - 0.5) * 1.5, 0, Math.PI * 2);
+    c.fill();
+    c.stroke();
+    // Inner circle cutout (crescent effect)
+    c.save();
+    c.globalCompositeOperation = 'destination-out';
+    c.beginPath();
+    c.arc(r * 0.4 + (seededRandom() - 0.5) * 2, -r * 0.15, r * 0.8, 0, Math.PI * 2);
+    c.fill();
+    c.restore();
+    // Re-stroke the outer crescent
+    c.beginPath();
+    c.arc(0, 0, r, 0, Math.PI * 2);
+    c.stroke();
+  }
+
+  function drawButterfly(c, s, hue) {
+    c.strokeStyle = `hsla(${hue}, 70%, 45%, 0.8)`;
+    c.lineWidth = 1.5;
+    // Left wings
+    c.beginPath();
+    c.fillStyle = `hsla(${hue}, 75%, 65%, 0.3)`;
+    c.ellipse(-s * 0.2, -s * 0.12, s * 0.22, s * 0.15, -0.4 + (seededRandom() - 0.5) * 0.2, 0, Math.PI * 2);
+    c.fill();
+    c.stroke();
+    c.beginPath();
+    c.fillStyle = `hsla(${(hue + 30) % 360}, 75%, 65%, 0.3)`;
+    c.ellipse(-s * 0.15, s * 0.1, s * 0.16, s * 0.1, -0.2 + (seededRandom() - 0.5) * 0.2, 0, Math.PI * 2);
+    c.fill();
+    c.stroke();
+    // Right wings (mirror)
+    c.beginPath();
+    c.fillStyle = `hsla(${hue}, 75%, 65%, 0.3)`;
+    c.ellipse(s * 0.2, -s * 0.12, s * 0.22, s * 0.15, 0.4 + (seededRandom() - 0.5) * 0.2, 0, Math.PI * 2);
+    c.fill();
+    c.stroke();
+    c.beginPath();
+    c.fillStyle = `hsla(${(hue + 30) % 360}, 75%, 65%, 0.3)`;
+    c.ellipse(s * 0.15, s * 0.1, s * 0.16, s * 0.1, 0.2 + (seededRandom() - 0.5) * 0.2, 0, Math.PI * 2);
+    c.fill();
+    c.stroke();
+    // Body
+    c.strokeStyle = `hsla(${hue}, 50%, 35%, 0.8)`;
+    c.lineWidth = 2;
+    wobblyLine(c, [[0, -s * 0.25], [0, s * 0.2]]);
+    // Antennae
+    c.lineWidth = 1;
+    wobblyLine(c, [[0, -s * 0.25], [-s * 0.12, -s * 0.4 + (seededRandom() - 0.5) * 2]]);
+    wobblyLine(c, [[0, -s * 0.25], [s * 0.12, -s * 0.4 + (seededRandom() - 0.5) * 2]]);
+  }
+
+  function drawSpeechBubble(c, s, hue) {
+    var texts = ['OMG', 'LOL', 'YOLO', ':)', '<3', 'WOW', 'HI', 'XD', '#TBT', 'BFF'];
+    var text = texts[Math.floor(seededRandom() * texts.length)];
+    c.strokeStyle = `hsla(${hue}, 50%, 40%, 0.75)`;
+    c.fillStyle = 'rgba(255, 255, 255, 0.55)';
+    c.lineWidth = 1.5;
+    // Rounded bubble
+    var bw = s * 0.7;
+    var bh = s * 0.4;
+    var r2 = s * 0.1;
+    c.beginPath();
+    c.moveTo(-bw / 2 + r2, -bh / 2);
+    c.lineTo(bw / 2 - r2 + (seededRandom() - 0.5) * 2, -bh / 2);
+    c.quadraticCurveTo(bw / 2, -bh / 2, bw / 2, -bh / 2 + r2);
+    c.lineTo(bw / 2, bh / 2 - r2 + (seededRandom() - 0.5) * 2);
+    c.quadraticCurveTo(bw / 2, bh / 2, bw / 2 - r2, bh / 2);
+    c.lineTo(-bw / 2 + r2 + (seededRandom() - 0.5) * 2, bh / 2);
+    c.quadraticCurveTo(-bw / 2, bh / 2, -bw / 2, bh / 2 - r2);
+    c.lineTo(-bw / 2, -bh / 2 + r2 + (seededRandom() - 0.5) * 2);
+    c.quadraticCurveTo(-bw / 2, -bh / 2, -bw / 2 + r2, -bh / 2);
+    c.closePath();
+    c.fill();
+    c.stroke();
+    // Tail
+    c.beginPath();
+    c.moveTo(-s * 0.05, bh / 2);
+    c.lineTo(-s * 0.15 + (seededRandom() - 0.5) * 2, bh / 2 + s * 0.2);
+    c.lineTo(s * 0.08 + (seededRandom() - 0.5) * 2, bh / 2);
+    c.stroke();
+    // Text
+    c.fillStyle = `hsla(${hue}, 60%, 40%, 0.85)`;
+    c.font = `bold ${s * 0.22}px sans-serif`;
+    c.textAlign = 'center';
+    c.textBaseline = 'middle';
+    c.fillText(text, (seededRandom() - 0.5) * 2, (seededRandom() - 0.5) * 2);
+  }
+
+  // ==========================================
+  // Cute character doodles
+  // ==========================================
+  function drawCatFace(c, s, hue) {
+    c.strokeStyle = `hsla(${hue}, 50%, 40%, 0.8)`;
+    c.fillStyle = `hsla(${hue}, 40%, 80%, 0.3)`;
+    c.lineWidth = 1.5;
+    var r = s * 0.3;
+    // Face
+    c.beginPath();
+    c.arc(0, 0, r + (seededRandom() - 0.5) * 1.5, 0, Math.PI * 2);
+    c.fill();
+    c.stroke();
+    // Ears (triangles)
+    c.beginPath();
+    c.moveTo(-r * 0.8 + (seededRandom() - 0.5) * 1, -r * 0.6);
+    c.lineTo(-r * 0.4, -r * 1.3 + (seededRandom() - 0.5) * 2);
+    c.lineTo(-r * 0.05 + (seededRandom() - 0.5) * 1, -r * 0.75);
+    c.stroke();
+    c.beginPath();
+    c.moveTo(r * 0.8 + (seededRandom() - 0.5) * 1, -r * 0.6);
+    c.lineTo(r * 0.4, -r * 1.3 + (seededRandom() - 0.5) * 2);
+    c.lineTo(r * 0.05 + (seededRandom() - 0.5) * 1, -r * 0.75);
+    c.stroke();
+    // Eyes
+    c.fillStyle = `hsla(${hue}, 50%, 30%, 0.8)`;
+    c.beginPath();
+    c.arc(-r * 0.35, -r * 0.1, r * 0.08, 0, Math.PI * 2);
+    c.fill();
+    c.beginPath();
+    c.arc(r * 0.35, -r * 0.1, r * 0.08, 0, Math.PI * 2);
+    c.fill();
+    // Nose
+    c.beginPath();
+    c.moveTo(0, r * 0.1);
+    c.lineTo(-r * 0.08, r * 0.2);
+    c.lineTo(r * 0.08, r * 0.2);
+    c.closePath();
+    c.fill();
+    // Mouth
+    c.beginPath();
+    c.moveTo(0, r * 0.2);
+    c.lineTo(-r * 0.15, r * 0.35 + (seededRandom() - 0.5) * 1);
+    c.stroke();
+    c.beginPath();
+    c.moveTo(0, r * 0.2);
+    c.lineTo(r * 0.15, r * 0.35 + (seededRandom() - 0.5) * 1);
+    c.stroke();
+    // Whiskers
+    c.lineWidth = 1;
+    wobblyLine(c, [[-r * 0.2, r * 0.15], [-r * 0.8, r * 0.05]]);
+    wobblyLine(c, [[-r * 0.2, r * 0.25], [-r * 0.8, r * 0.3]]);
+    wobblyLine(c, [[r * 0.2, r * 0.15], [r * 0.8, r * 0.05]]);
+    wobblyLine(c, [[r * 0.2, r * 0.25], [r * 0.8, r * 0.3]]);
+  }
+
+  function drawBearFace(c, s, hue) {
+    c.strokeStyle = `hsla(30, 45%, 35%, 0.8)`;
+    c.fillStyle = `hsla(30, 40%, 65%, 0.3)`;
+    c.lineWidth = 1.5;
+    var r = s * 0.32;
+    // Ears
+    c.beginPath();
+    c.arc(-r * 0.75, -r * 0.75, r * 0.3 + (seededRandom() - 0.5) * 1, 0, Math.PI * 2);
+    c.fill();
+    c.stroke();
+    c.beginPath();
+    c.arc(r * 0.75, -r * 0.75, r * 0.3 + (seededRandom() - 0.5) * 1, 0, Math.PI * 2);
+    c.fill();
+    c.stroke();
+    // Face
+    c.beginPath();
+    c.arc(0, 0, r + (seededRandom() - 0.5) * 1.5, 0, Math.PI * 2);
+    c.fill();
+    c.stroke();
+    // Eyes
+    c.fillStyle = `hsla(30, 40%, 20%, 0.85)`;
+    c.beginPath();
+    c.arc(-r * 0.3, -r * 0.15, r * 0.08, 0, Math.PI * 2);
+    c.fill();
+    c.beginPath();
+    c.arc(r * 0.3, -r * 0.15, r * 0.08, 0, Math.PI * 2);
+    c.fill();
+    // Snout
+    c.fillStyle = `hsla(30, 30%, 75%, 0.5)`;
+    c.beginPath();
+    c.ellipse(0, r * 0.2, r * 0.25, r * 0.18, 0, 0, Math.PI * 2);
+    c.fill();
+    c.stroke();
+    // Nose
+    c.fillStyle = `hsla(30, 40%, 20%, 0.85)`;
+    c.beginPath();
+    c.ellipse(0, r * 0.12, r * 0.1, r * 0.07, 0, 0, Math.PI * 2);
+    c.fill();
+    // Mouth
+    c.beginPath();
+    c.moveTo(0, r * 0.19);
+    c.quadraticCurveTo(-r * 0.12, r * 0.35 + (seededRandom() - 0.5) * 1, -r * 0.15, r * 0.3);
+    c.stroke();
+    c.beginPath();
+    c.moveTo(0, r * 0.19);
+    c.quadraticCurveTo(r * 0.12, r * 0.35 + (seededRandom() - 0.5) * 1, r * 0.15, r * 0.3);
+    c.stroke();
+  }
+
+  function drawBunnyFace(c, s, hue) {
+    c.strokeStyle = `hsla(330, 40%, 50%, 0.8)`;
+    c.fillStyle = `hsla(330, 30%, 85%, 0.3)`;
+    c.lineWidth = 1.5;
+    var r = s * 0.28;
+    // Long ears
+    c.beginPath();
+    c.ellipse(-r * 0.35, -r * 1.4, r * 0.2, r * 0.6 + (seededRandom() - 0.5) * 2,
+              -0.15 + (seededRandom() - 0.5) * 0.2, 0, Math.PI * 2);
+    c.fill();
+    c.stroke();
+    // Inner ear
+    c.fillStyle = `hsla(350, 60%, 75%, 0.35)`;
+    c.beginPath();
+    c.ellipse(-r * 0.35, -r * 1.4, r * 0.1, r * 0.4, -0.15, 0, Math.PI * 2);
+    c.fill();
+    c.fillStyle = `hsla(330, 30%, 85%, 0.3)`;
+    c.beginPath();
+    c.ellipse(r * 0.35, -r * 1.4, r * 0.2, r * 0.6 + (seededRandom() - 0.5) * 2,
+              0.15 + (seededRandom() - 0.5) * 0.2, 0, Math.PI * 2);
+    c.fill();
+    c.stroke();
+    c.fillStyle = `hsla(350, 60%, 75%, 0.35)`;
+    c.beginPath();
+    c.ellipse(r * 0.35, -r * 1.4, r * 0.1, r * 0.4, 0.15, 0, Math.PI * 2);
+    c.fill();
+    // Face
+    c.fillStyle = `hsla(330, 30%, 85%, 0.3)`;
+    c.beginPath();
+    c.arc(0, 0, r + (seededRandom() - 0.5) * 1.5, 0, Math.PI * 2);
+    c.fill();
+    c.stroke();
+    // Eyes
+    c.fillStyle = `hsla(330, 40%, 25%, 0.85)`;
+    c.beginPath();
+    c.arc(-r * 0.3, -r * 0.1, r * 0.07, 0, Math.PI * 2);
+    c.fill();
+    c.beginPath();
+    c.arc(r * 0.3, -r * 0.1, r * 0.07, 0, Math.PI * 2);
+    c.fill();
+    // Nose (small triangle)
+    c.fillStyle = `hsla(350, 60%, 65%, 0.8)`;
+    c.beginPath();
+    c.moveTo(0, r * 0.1);
+    c.lineTo(-r * 0.07, r * 0.18);
+    c.lineTo(r * 0.07, r * 0.18);
+    c.closePath();
+    c.fill();
+    // Mouth
+    c.beginPath();
+    c.moveTo(0, r * 0.18);
+    c.lineTo(0, r * 0.3 + (seededRandom() - 0.5) * 1);
+    c.stroke();
+    c.beginPath();
+    c.arc(-r * 0.1, r * 0.3, r * 0.1, 0, Math.PI, true);
+    c.stroke();
+    c.beginPath();
+    c.arc(r * 0.1, r * 0.3, r * 0.1, 0, Math.PI, true);
+    c.stroke();
+  }
+
+  function drawDiamond(c, s, hue) {
+    c.strokeStyle = `hsla(${hue}, 70%, 50%, 0.85)`;
+    c.fillStyle = `hsla(${hue}, 80%, 75%, 0.25)`;
+    c.lineWidth = 2;
+    var w2 = s * 0.35;
+    var h2 = s * 0.5;
+    var mid = s * 0.15;
+    // Outer shape
+    c.beginPath();
+    c.moveTo(0, -h2 + (seededRandom() - 0.5) * 2);
+    c.lineTo(w2 + (seededRandom() - 0.5) * 1.5, -mid);
+    c.lineTo(0, h2 + (seededRandom() - 0.5) * 2);
+    c.lineTo(-w2 + (seededRandom() - 0.5) * 1.5, -mid);
+    c.closePath();
+    c.fill();
+    c.stroke();
+    // Inner facet lines
+    c.lineWidth = 1;
+    c.strokeStyle = `hsla(${hue}, 60%, 55%, 0.5)`;
+    c.beginPath();
+    c.moveTo(-w2, -mid);
+    c.lineTo(w2, -mid);
+    c.stroke();
+    c.beginPath();
+    c.moveTo(0, -h2);
+    c.lineTo(-w2 * 0.4 + (seededRandom() - 0.5) * 1, -mid);
+    c.lineTo(0, h2);
+    c.stroke();
+    c.beginPath();
+    c.moveTo(0, -h2);
+    c.lineTo(w2 * 0.4 + (seededRandom() - 0.5) * 1, -mid);
+    c.lineTo(0, h2);
     c.stroke();
   }
 

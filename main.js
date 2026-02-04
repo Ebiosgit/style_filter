@@ -132,6 +132,14 @@
       applyFilter();
     });
 
+    // Doodle picker button toggle
+    document.getElementById('doodlePicker').addEventListener('click', (e) => {
+      const btn = e.target.closest('.doodle-btn');
+      if (!btn) return;
+      btn.classList.toggle('active');
+      applyFilter();
+    });
+
     sketchSlider.addEventListener('input', (e) => {
       sketchIntensity = parseInt(e.target.value);
       debouncedApplyFilter();
@@ -349,17 +357,33 @@
     ctx.restore();
   }
 
+  const allDrawFns = {
+    heart: drawHeart, star: drawStar, flower: drawFlower, cloud: drawCloud,
+    sparkle: drawSparkle, arrow: drawArrow, spiral: drawSpiral, music: drawMusicNote,
+    crown: drawCrown, rainbow: drawRainbow, lightning: drawLightning, moon: drawMoon,
+    butterfly: drawButterfly, speech: drawSpeechBubble, cat: drawCatFace,
+    bear: drawBearFace, bunny: drawBunnyFace, diamond: drawDiamond
+  };
+
+  function getActiveDrawFns() {
+    const activeBtns = document.querySelectorAll('.doodle-btn.active');
+    const fns = [];
+    activeBtns.forEach(btn => {
+      const key = btn.dataset.doodle;
+      if (allDrawFns[key]) fns.push(allDrawFns[key]);
+    });
+    return fns;
+  }
+
   function drawDoodleElements(w, h) {
     resetSeed();
     const count = doodleDensity;
+    const drawFns = getActiveDrawFns();
+    if (drawFns.length === 0) return;
 
     ctx.save();
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
-
-    const drawFns = [drawHeart, drawStar, drawFlower, drawCloud, drawSparkle, drawArrow, drawSpiral,
-      drawMusicNote, drawCrown, drawRainbow, drawLightning, drawMoon, drawButterfly, drawSpeechBubble,
-      drawCatFace, drawBearFace, drawBunnyFace, drawDiamond];
 
     for (let i = 0; i < count; i++) {
       const x = seededRandom() * w;
@@ -958,6 +982,7 @@
     doodleDensitySlider.value = 12;
     doodleToggle.classList.remove('active');
     doodleOptions.classList.add('hidden');
+    document.querySelectorAll('.doodle-btn').forEach(btn => btn.classList.add('active'));
 
     document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
     document.querySelector('[data-filter="valencia"]').classList.add('active');

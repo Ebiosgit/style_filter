@@ -33,6 +33,12 @@
   let doodleDensity = 20;
   let doodleSeed = 1;
 
+  // AI Mode State
+  let aiMode = false;
+  let aiConfig = null;
+  let aiLoading = false;
+  let geminiApiKey = localStorage.getItem('geminiApiKey') || '';
+
   // 2016 Style Filters
   const filters = {
     valencia: {
@@ -146,6 +152,20 @@
     });
     sketchSlider.addEventListener('change', () => applyFilter());
     doodleDensitySlider.addEventListener('change', () => applyFilter());
+
+    // AI Auto-decorate
+    const aiBtn = document.getElementById('aiDecorateBtn');
+    const aiKeyInput = document.getElementById('geminiApiKey');
+    if (aiBtn) {
+      aiBtn.addEventListener('click', activateAiMode);
+    }
+    if (aiKeyInput) {
+      aiKeyInput.value = geminiApiKey;
+      aiKeyInput.addEventListener('change', (e) => {
+        geminiApiKey = e.target.value.trim();
+        localStorage.setItem('geminiApiKey', geminiApiKey);
+      });
+    }
   }
 
   function debouncedApplyFilter() {
@@ -261,7 +281,9 @@
     if (grainAmount > 0) applyGrain(grainAmount);
 
     // Doodle Art overlay (applied after filter, preserving original look)
-    if (doodleEnabled) {
+    if (aiMode && aiConfig) {
+      applyAiDoodleArt();
+    } else if (doodleEnabled) {
       applyDoodleArt();
     }
 
@@ -919,6 +941,303 @@
   }
 
   // ==========================================
+  // AI Auto-Decorate Functions
+  // ==========================================
+  function getImageBase64() {
+    const maxDim = 1024;
+    const tmpCanvas = document.createElement('canvas');
+    let w = originalImage.width;
+    let h = originalImage.height;
+    if (w > maxDim || h > maxDim) {
+      if (w > h) { h = (h * maxDim) / w; w = maxDim; }
+      else { w = (w * maxDim) / h; h = maxDim; }
+    }
+    tmpCanvas.width = Math.round(w);
+    tmpCanvas.height = Math.round(h);
+    const tmpCtx = tmpCanvas.getContext('2d');
+    tmpCtx.drawImage(originalImage, 0, 0, tmpCanvas.width, tmpCanvas.height);
+    const dataUrl = tmpCanvas.toDataURL('image/jpeg', 0.8);
+    return dataUrl.split(',')[1];
+  }
+
+  async function callGeminiVision(base64Data) {
+    const prompt = `당신은 평범한 사진을 동화 속 한 장면처럼 연출하는 '비주얼 아트 디렉터'이자 'AI 프롬프트 엔지니어'입니다.
+첨부된 이미지의 구도와 피사체를 정밀하게 분석하여, 이 사진과 완벽하게 어울리는 '핸드 드로잉 및 낙서(Doodle)' 요소를 추가하기 위한 최적의 배치를 JSON으로 설계해 주세요.
+
+아래 5단계를 반드시 수행하세요:
+
+Step 1. 배경 및 피사체 분석: 사진 속 주요 배경(산, 바다, 도시 등)과 핵심 피사체(인물, 동물, 사물)를 파악합니다. 피사체의 위치(좌표)와 크기도 추정합니다.
+
+Step 2. 드로잉 요소 매칭: 배경을 보완할 스케치 요소(라인 드로잉)와 추가할 낙서 요소를 기획합니다.
+- 사용 가능한 낙서 타입 (정확히 이 문자열만 사용): heart, star, flower, cloud, sparkle, arrow, spiral, music, crown, rainbow, lightning, moon, butterfly, speech, cat, bear, bunny, diamond
+
+Step 3. 질감 및 스타일 지정: '색연필이나 크레용 질감', '검은색 외곽선 스케치', '삐뚤빼뚤한 수작업 느낌'의 스타일을 적용합니다. 이에 맞는 필터를 선택합니다.
+- 사용 가능한 필터: valencia(따뜻한 오후), nashville(핑크빛 추억), earlybird(빈티지 감성), vsco(차분한 필름)
+
+Step 4. 대비(Contrast) 설정: 실사 피사체와 원본 사진의 전체적인 밝기, 조명 톤을 절대 변경하지 않고 그대로 유지하여, 추가되는 드로잉 요소들과 극적인 대비를 이루도록 설계합니다. 낙서 요소는 피사체의 얼굴을 직접 덮지 않도록 배치합니다.
+
+Step 5. 최종 배치 완성: 아래 좌표계와 규칙에 따라 JSON을 생성합니다.
+
+[좌표계] x, y는 0~1 정규화 좌표. x: 0=왼쪽, 1=오른쪽. y: 0=위쪽, 1=아래쪽.
+
+[배치 규칙]
+- 하늘/상단 여백: cloud, rainbow, moon, star, sparkle 등 → y: 0.02~0.25
+- 지면/하단: flower, butterfly 등 자연 요소 → y: 0.75~0.98
+- 인물 감지 시: crown은 머리 바로 위, speech는 근처(얼굴 위 직접 배치 금지)
+- heart, sparkle, music 등 악센트 요소는 여백 공간에 분산
+- 배경 요소(산, 건물, 나무 등)의 윤곽을 따라 라인 드로잉 느낌의 요소 배치
+- 피사체 주변에 감성적 낙서 요소(화살표, 하트, 별 등) 추가
+
+[출력 형식 설명]
+"업로드한 원본 사진의 고유한 밝기, 색감, 조명 분위기와 실사 피사체는 수정 없이 완벽하게 원본 그대로 유지합니다. 이 사진 위에 손으로 그린 듯한 드로잉 스타일의 라인 드로잉과 낙서 요소들을 오버레이 합니다. 배경 요소들을 검은색 외곽선 스케치와 색연필 질감으로 표현하고, 하늘/여백에는 추천 낙서 요소들을 추가하고, 피사체에도 추천 낙서 요소들을 추가해 주세요. 실사와 드로잉이 조화를 이루는 감성적인 포스터 스타일로 생성해 주세요."
+
+위 콘셉트를 실현하는 JSON을 아래 스키마에 맞춰 출력하세요:
+{
+  "filter": "valencia | nashville | earlybird | vsco 중 하나",
+  "doodles": [
+    { "type": "18개 타입 중 하나", "x": 0~1, "y": 0~1, "size": 0.3~2.0, "hue": 0~360, "rotation": -0.5~0.5, "text": "speech 타입일 때만 텍스트" }
+  ],
+  "texts": [
+    { "content": "짧은 영문 텍스트", "x": 0~1, "y": 0~1, "size": 0.03~0.12, "hue": 0~360, "rotation": -0.3~0.3, "style": "handwritten | block | cursive" }
+  ],
+  "mood": "warm | cool | vintage | dreamy"
+}
+
+[필수 가이드라인]
+- doodles는 15~25개로 풍성하되 균형 잡힌 구성
+- texts는 1~3개, 여백 공간에 배치, 사진 분위기에 맞는 감성 영문 문구 (예: "dreamy days", "hello sunshine", "#throwback")
+- 배경의 윤곽선 느낌을 살리기 위해 배경 경계 부근에 arrow, spiral, sparkle 등을 윤곽을 따라 배치
+- 피사체 근처에 heart, star, crown, speech 등 감정/표현 요소를 집중 배치
+- 전체적으로 '실사 + 핸드드로잉 오버레이'가 조화를 이루는 동화적 감성 포스터 느낌`;
+
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiApiKey}`;
+    const body = {
+      contents: [{
+        parts: [
+          { text: prompt },
+          { inline_data: { mime_type: 'image/jpeg', data: base64Data } }
+        ]
+      }],
+      generationConfig: {
+        temperature: 0.7,
+        maxOutputTokens: 2048,
+        responseMimeType: 'application/json'
+      }
+    };
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+
+    if (!response.ok) {
+      const errData = await response.json().catch(() => ({}));
+      const msg = errData?.error?.message || response.statusText;
+      throw new Error(`API 오류 (${response.status}): ${msg}`);
+    }
+
+    const result = await response.json();
+    const text = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!text) throw new Error('AI 응답이 비어있습니다.');
+    return JSON.parse(text);
+  }
+
+  function validateAiConfig(config) {
+    const validFilters = ['valencia', 'nashville', 'earlybird', 'vsco'];
+    const validDoodleTypes = Object.keys(allDrawFns);
+
+    if (!validFilters.includes(config.filter)) {
+      config.filter = 'valencia';
+    }
+
+    if (!Array.isArray(config.doodles)) config.doodles = [];
+    config.doodles = config.doodles.filter(d => validDoodleTypes.includes(d.type)).map(d => ({
+      type: d.type,
+      x: clamp(d.x ?? 0.5, 0, 1),
+      y: clamp(d.y ?? 0.5, 0, 1),
+      size: clamp(d.size ?? 1, 0.3, 2.0),
+      hue: clamp(d.hue ?? 0, 0, 360),
+      rotation: clamp(d.rotation ?? 0, -0.5, 0.5),
+      text: d.text || ''
+    }));
+
+    if (!Array.isArray(config.texts)) config.texts = [];
+    config.texts = config.texts.slice(0, 5).map(t => ({
+      content: String(t.content || '').slice(0, 30),
+      x: clamp(t.x ?? 0.5, 0, 1),
+      y: clamp(t.y ?? 0.5, 0, 1),
+      size: clamp(t.size ?? 0.06, 0.03, 0.12),
+      hue: clamp(t.hue ?? 0, 0, 360),
+      rotation: clamp(t.rotation ?? 0, -0.3, 0.3),
+      style: ['handwritten', 'block', 'cursive'].includes(t.style) ? t.style : 'handwritten'
+    }));
+
+    return config;
+  }
+
+  async function activateAiMode() {
+    if (!originalImage) return;
+    if (aiLoading) return;
+
+    if (!geminiApiKey) {
+      alert('Gemini API Key를 입력해주세요.');
+      const input = document.getElementById('geminiApiKey');
+      if (input) input.focus();
+      return;
+    }
+
+    const overlay = document.getElementById('aiLoadingOverlay');
+    aiLoading = true;
+    if (overlay) overlay.classList.remove('hidden');
+
+    try {
+      const base64 = getImageBase64();
+      const rawConfig = await callGeminiVision(base64);
+      const config = validateAiConfig(rawConfig);
+
+      aiConfig = config;
+      aiMode = true;
+
+      // Apply the AI-chosen filter
+      currentFilter = config.filter;
+      document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+      const targetBtn = document.querySelector(`[data-filter="${config.filter}"]`);
+      if (targetBtn) targetBtn.classList.add('active');
+
+      // Disable manual doodle mode
+      doodleEnabled = false;
+      doodleToggle.classList.remove('active');
+      doodleOptions.classList.add('hidden');
+
+      applyFilter();
+    } catch (err) {
+      console.error('AI Decorate Error:', err);
+      alert('AI 꾸미기 실패: ' + err.message);
+      aiMode = false;
+      aiConfig = null;
+    } finally {
+      aiLoading = false;
+      if (overlay) overlay.classList.add('hidden');
+    }
+  }
+
+  function applyAiDoodleArt() {
+    if (!aiConfig) return;
+    const w = canvas.width;
+    const h = canvas.height;
+
+    // Draw AI-placed doodles
+    ctx.save();
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    resetSeed();
+
+    for (const d of aiConfig.doodles) {
+      const drawFn = allDrawFns[d.type];
+      if (!drawFn) continue;
+
+      const px = d.x * w;
+      const py = d.y * h;
+      const baseSize = Math.min(w, h) * 0.07;
+      const size = baseSize * d.size;
+
+      ctx.save();
+      ctx.translate(px, py);
+      ctx.rotate(d.rotation);
+
+      if (d.type === 'speech' && d.text) {
+        drawSpeechBubbleWithText(ctx, size, d.hue, d.text);
+      } else {
+        drawFn(ctx, size, d.hue);
+      }
+      ctx.restore();
+    }
+
+    ctx.restore();
+
+    // Draw AI text overlays
+    for (const t of aiConfig.texts) {
+      drawHandwrittenText(t, w, h);
+    }
+  }
+
+  function drawHandwrittenText(config, w, h) {
+    const px = config.x * w;
+    const py = config.y * h;
+    const fontSize = Math.max(16, Math.min(w, h) * config.size);
+
+    ctx.save();
+    ctx.translate(px, py);
+    ctx.rotate(config.rotation);
+
+    let fontFamily;
+    switch (config.style) {
+      case 'cursive': fontFamily = "'Segoe Script', 'Comic Sans MS', cursive"; break;
+      case 'block': fontFamily = "Impact, 'Arial Black', sans-serif"; break;
+      default: fontFamily = "'Comic Sans MS', 'Chalkboard SE', cursive"; break;
+    }
+
+    ctx.font = `bold ${fontSize}px ${fontFamily}`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    // White outline
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+    ctx.lineWidth = Math.max(3, fontSize * 0.12);
+    ctx.lineJoin = 'round';
+    ctx.strokeText(config.content, 0, 0);
+
+    // Colored fill
+    ctx.fillStyle = `hsl(${config.hue}, 70%, 40%)`;
+    ctx.fillText(config.content, 0, 0);
+
+    ctx.restore();
+  }
+
+  function drawSpeechBubbleWithText(c, s, hue, text) {
+    c.strokeStyle = `hsla(${hue}, 50%, 35%, 0.9)`;
+    c.fillStyle = 'rgba(255, 255, 255, 0.55)';
+    c.lineWidth = Math.max(1.5, s * 0.05);
+
+    // Size bubble to text
+    var textLen = text.length;
+    var bw = Math.max(s * 0.7, s * 0.15 * textLen);
+    var bh = s * 0.45;
+    var r2 = s * 0.1;
+
+    // Rounded bubble
+    c.beginPath();
+    c.moveTo(-bw / 2 + r2, -bh / 2);
+    c.lineTo(bw / 2 - r2, -bh / 2);
+    c.quadraticCurveTo(bw / 2, -bh / 2, bw / 2, -bh / 2 + r2);
+    c.lineTo(bw / 2, bh / 2 - r2);
+    c.quadraticCurveTo(bw / 2, bh / 2, bw / 2 - r2, bh / 2);
+    c.lineTo(-bw / 2 + r2, bh / 2);
+    c.quadraticCurveTo(-bw / 2, bh / 2, -bw / 2, bh / 2 - r2);
+    c.lineTo(-bw / 2, -bh / 2 + r2);
+    c.quadraticCurveTo(-bw / 2, -bh / 2, -bw / 2 + r2, -bh / 2);
+    c.closePath();
+    c.fill();
+    c.stroke();
+
+    // Tail
+    c.beginPath();
+    c.moveTo(-s * 0.05, bh / 2);
+    c.lineTo(-s * 0.15, bh / 2 + s * 0.2);
+    c.lineTo(s * 0.08, bh / 2);
+    c.stroke();
+
+    // Text
+    c.fillStyle = `hsla(${hue}, 60%, 35%, 0.95)`;
+    c.font = `bold ${s * 0.2}px sans-serif`;
+    c.textAlign = 'center';
+    c.textBaseline = 'middle';
+    c.fillText(text, 0, 0);
+  }
+
+  // ==========================================
   // Effects
   // ==========================================
   function applyVignette(strength) {
@@ -980,6 +1299,13 @@
     doodleToggle.classList.remove('active');
     doodleOptions.classList.add('hidden');
     document.querySelectorAll('.doodle-btn').forEach(btn => btn.classList.add('active'));
+
+    // Reset AI state
+    aiMode = false;
+    aiConfig = null;
+    aiLoading = false;
+    const aiOverlay = document.getElementById('aiLoadingOverlay');
+    if (aiOverlay) aiOverlay.classList.add('hidden');
 
     document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
     document.querySelector('[data-filter="valencia"]').classList.add('active');

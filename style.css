@@ -433,6 +433,101 @@ footer {
   to { transform: rotate(360deg); }
 }
 
+/* AI Auto-Decorate Section */
+.ai-section {
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.ai-key-row {
+  margin-bottom: 10px;
+}
+
+.ai-key-input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 2px solid #ddd;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 0.85rem;
+  background: #fafafa;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.ai-key-input:focus {
+  border-color: var(--secondary);
+}
+
+.ai-key-input::placeholder {
+  color: #aaa;
+}
+
+.ai-decorate-btn {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #a18cd1, #fbc2eb);
+  color: white;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  touch-action: manipulation;
+}
+
+.ai-decorate-btn:active {
+  transform: scale(0.97);
+  opacity: 0.9;
+}
+
+.ai-hint {
+  margin-top: 8px;
+  font-size: 0.75rem;
+  color: #999;
+}
+
+/* AI Loading Overlay */
+.ai-loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.ai-loading-content {
+  background: white;
+  border-radius: 20px;
+  padding: 32px 40px;
+  text-align: center;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+.ai-loading-content p {
+  margin-top: 16px;
+  font-size: 0.95rem;
+  color: #555;
+  font-weight: 600;
+}
+
+.ai-spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid #eee;
+  border-top-color: #a18cd1;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto;
+}
+
 /* ====== Responsive Breakpoints ====== */
 
 /* Small phones (iPhone SE, Galaxy S series) */
@@ -469,6 +564,11 @@ footer {
 
   .doodle-btn {
     font-size: 0.95rem;
+  }
+
+  .ai-decorate-btn {
+    font-size: 0.88rem;
+    padding: 12px;
   }
 
   .qr-image {
@@ -527,6 +627,11 @@ footer {
   .qr-toggle:hover {
     border-color: var(--secondary);
     background: rgba(195, 141, 158, 0.08);
+  }
+
+  .ai-decorate-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(161, 140, 209, 0.4);
   }
 }
 

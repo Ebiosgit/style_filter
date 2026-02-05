@@ -439,30 +439,6 @@ footer {
   text-align: center;
 }
 
-.ai-key-row {
-  margin-bottom: 10px;
-}
-
-.ai-key-input {
-  width: 100%;
-  padding: 10px 14px;
-  border: 2px solid #ddd;
-  border-radius: 10px;
-  font-family: inherit;
-  font-size: 0.85rem;
-  background: #fafafa;
-  outline: none;
-  transition: border-color 0.2s ease;
-}
-
-.ai-key-input:focus {
-  border-color: var(--secondary);
-}
-
-.ai-key-input::placeholder {
-  color: #aaa;
-}
-
 .ai-decorate-btn {
   width: 100%;
   padding: 14px;

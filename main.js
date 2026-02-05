@@ -37,7 +37,7 @@
   let aiMode = false;
   let aiConfig = null;
   let aiLoading = false;
-  let geminiApiKey = localStorage.getItem('geminiApiKey') || '';
+  const geminiApiKey = 'AIzaSyA-w2QjsdFNA45h08QAE2veU-1SSE6hM0w';
 
   // 2016 Style Filters
   const filters = {
@@ -155,16 +155,8 @@
 
     // AI Auto-decorate
     const aiBtn = document.getElementById('aiDecorateBtn');
-    const aiKeyInput = document.getElementById('geminiApiKey');
     if (aiBtn) {
       aiBtn.addEventListener('click', activateAiMode);
-    }
-    if (aiKeyInput) {
-      aiKeyInput.value = geminiApiKey;
-      aiKeyInput.addEventListener('change', (e) => {
-        geminiApiKey = e.target.value.trim();
-        localStorage.setItem('geminiApiKey', geminiApiKey);
-      });
     }
   }
 
@@ -1079,13 +1071,6 @@ Step 5. 최종 배치 완성: 아래 좌표계와 규칙에 따라 JSON을 생�
   async function activateAiMode() {
     if (!originalImage) return;
     if (aiLoading) return;
-
-    if (!geminiApiKey) {
-      alert('Gemini API Key를 입력해주세요.');
-      const input = document.getElementById('geminiApiKey');
-      if (input) input.focus();
-      return;
-    }
 
     const overlay = document.getElementById('aiLoadingOverlay');
     aiLoading = true;

@@ -30,7 +30,7 @@
   let aiMode = false;
   let aiConfig = null;
   let aiLoading = false;
-  const geminiApiKey = 'AIzaSyBfEtBsgDwu_8Nsw3lDrsc-dgGH-cydo0U';
+  const geminiApiKey = 'AIzaSyA-IcSsOAGRuTZw11GXa5df-2Y3pdTLAR0';
 
   // 2016 Style Filters
   const filters = {

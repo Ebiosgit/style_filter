@@ -16,10 +16,6 @@
   const shareBtn = document.getElementById('shareBtn');
   const qrToggle = document.getElementById('qrToggle');
   const qrContent = document.getElementById('qrContent');
-  const doodleToggle = document.getElementById('doodleToggle');
-  const doodleOptions = document.getElementById('doodleOptions');
-  const sketchSlider = document.getElementById('sketchIntensity');
-  const doodleDensitySlider = document.getElementById('doodleDensity');
 
   // State
   let originalImage = null;
@@ -28,9 +24,6 @@
   let grainAmount = 15;
   let isProcessing = false;
   let filterDebounceTimer = null;
-  let doodleEnabled = false;
-  let sketchIntensity = 60;
-  let doodleDensity = 20;
   let doodleSeed = 1;
 
   // AI Mode State
@@ -125,33 +118,6 @@
       qrToggle.textContent = qrContent.classList.contains('hidden')
         ? 'QR코드로 친구에게 공유' : 'QR코드 닫기';
     });
-
-    // Doodle Art toggle
-    doodleToggle.addEventListener('click', () => {
-      doodleEnabled = !doodleEnabled;
-      doodleToggle.classList.toggle('active', doodleEnabled);
-      doodleOptions.classList.toggle('hidden', !doodleEnabled);
-      applyFilter();
-    });
-
-    // Doodle picker button toggle
-    document.getElementById('doodlePicker').addEventListener('click', (e) => {
-      const btn = e.target.closest('.doodle-btn');
-      if (!btn) return;
-      btn.classList.toggle('active');
-      applyFilter();
-    });
-
-    sketchSlider.addEventListener('input', (e) => {
-      sketchIntensity = parseInt(e.target.value);
-      debouncedApplyFilter();
-    });
-    doodleDensitySlider.addEventListener('input', (e) => {
-      doodleDensity = parseInt(e.target.value);
-      debouncedApplyFilter();
-    });
-    sketchSlider.addEventListener('change', () => applyFilter());
-    doodleDensitySlider.addEventListener('change', () => applyFilter());
 
     // AI Auto-decorate
     const aiBtn = document.getElementById('aiDecorateBtn');
@@ -272,99 +238,13 @@
     if (filter.vignette > 0) applyVignette(filter.vignette * intensityRatio);
     if (grainAmount > 0) applyGrain(grainAmount);
 
-    // Doodle Art overlay (applied after filter, preserving original look)
+    // AI Doodle Art overlay
     if (aiMode && aiConfig) {
       applyAiDoodleArt();
-    } else if (doodleEnabled) {
-      applyDoodleArt();
     }
 
     addWatermark();
     isProcessing = false;
-  }
-
-  // ==========================================
-  // Doodle Art Engine
-  // ==========================================
-  function applyDoodleArt() {
-    const w = canvas.width;
-    const h = canvas.height;
-
-    // Step 1: Edge detection sketch overlay
-    if (sketchIntensity > 0) {
-      applySketchOverlay(w, h);
-    }
-
-    // Step 2: Draw random doodle elements
-    if (doodleDensity > 0) {
-      drawDoodleElements(w, h);
-    }
-  }
-
-  function applySketchOverlay(w, h) {
-    const src = ctx.getImageData(0, 0, w, h);
-    const srcData = src.data;
-    const strength = sketchIntensity / 100;
-
-    // Convert to grayscale for edge detection
-    const gray = new Float32Array(w * h);
-    for (let i = 0; i < w * h; i++) {
-      const idx = i * 4;
-      gray[i] = 0.299 * srcData[idx] + 0.587 * srcData[idx + 1] + 0.114 * srcData[idx + 2];
-    }
-
-    // Sobel edge detection
-    const edges = new Float32Array(w * h);
-    for (let y = 1; y < h - 1; y++) {
-      for (let x = 1; x < w - 1; x++) {
-        const idx = y * w + x;
-        const gx = (
-          -gray[idx - w - 1] + gray[idx - w + 1]
-          - 2 * gray[idx - 1] + 2 * gray[idx + 1]
-          - gray[idx + w - 1] + gray[idx + w + 1]
-        );
-        const gy = (
-          -gray[idx - w - 1] - 2 * gray[idx - w] - gray[idx - w + 1]
-          + gray[idx + w - 1] + 2 * gray[idx + w] + gray[idx + w + 1]
-        );
-        edges[idx] = Math.sqrt(gx * gx + gy * gy);
-      }
-    }
-
-    // Overlay edges as dark sketch lines
-    const threshold = 30;
-    ctx.save();
-    ctx.globalAlpha = strength * 0.7;
-    ctx.globalCompositeOperation = 'multiply';
-
-    const edgeCanvas = document.createElement('canvas');
-    edgeCanvas.width = w;
-    edgeCanvas.height = h;
-    const edgeCtx = edgeCanvas.getContext('2d');
-    const edgeImg = edgeCtx.createImageData(w, h);
-    const eData = edgeImg.data;
-
-    for (let i = 0; i < w * h; i++) {
-      const e = edges[i];
-      const idx = i * 4;
-      if (e > threshold) {
-        // Dark sketch line with slight wobble effect
-        const val = Math.max(0, 255 - e * 2);
-        eData[idx] = val;
-        eData[idx + 1] = val;
-        eData[idx + 2] = val;
-        eData[idx + 3] = 255;
-      } else {
-        eData[idx] = 255;
-        eData[idx + 1] = 255;
-        eData[idx + 2] = 255;
-        eData[idx + 3] = 255;
-      }
-    }
-
-    edgeCtx.putImageData(edgeImg, 0, 0);
-    ctx.drawImage(edgeCanvas, 0, 0);
-    ctx.restore();
   }
 
   const allDrawFns = {
@@ -374,44 +254,6 @@
     butterfly: drawButterfly, speech: drawSpeechBubble, cat: drawCatFace,
     bear: drawBearFace, bunny: drawBunnyFace, diamond: drawDiamond
   };
-
-  function getActiveDrawFns() {
-    const activeBtns = document.querySelectorAll('.doodle-btn.active');
-    const fns = [];
-    activeBtns.forEach(btn => {
-      const key = btn.dataset.doodle;
-      if (allDrawFns[key]) fns.push(allDrawFns[key]);
-    });
-    return fns;
-  }
-
-  function drawDoodleElements(w, h) {
-    resetSeed();
-    const count = doodleDensity;
-    const drawFns = getActiveDrawFns();
-    if (drawFns.length === 0) return;
-
-    ctx.save();
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-
-    for (let i = 0; i < count; i++) {
-      const x = seededRandom() * w;
-      const y = seededRandom() * h;
-      const baseSize = Math.min(w, h) * 0.07;
-      const size = baseSize * (0.6 + seededRandom() * 1.2);
-      const fnIdx = Math.floor(seededRandom() * drawFns.length);
-      const hue = Math.floor(seededRandom() * 360);
-
-      ctx.save();
-      ctx.translate(x, y);
-      ctx.rotate((seededRandom() - 0.5) * 0.5);
-      drawFns[fnIdx](ctx, size, hue);
-      ctx.restore();
-    }
-
-    ctx.restore();
-  }
 
   // ==========================================
   // Doodle drawing primitives (hand-drawn feel)
@@ -1090,11 +932,6 @@ Step 5. 최종 배치 완성: 아래 좌표계와 규칙에 따라 JSON을 생�
       const targetBtn = document.querySelector(`[data-filter="${config.filter}"]`);
       if (targetBtn) targetBtn.classList.add('active');
 
-      // Disable manual doodle mode
-      doodleEnabled = false;
-      doodleToggle.classList.remove('active');
-      doodleOptions.classList.add('hidden');
-
       applyFilter();
     } catch (err) {
       console.error('AI Decorate Error:', err);
@@ -1276,14 +1113,6 @@ Step 5. 최종 배치 완성: 아래 좌표계와 규칙에 따라 JSON을 생�
     grainAmount = 15;
     intensitySlider.value = 80;
     grainSlider.value = 15;
-    doodleEnabled = false;
-    sketchIntensity = 60;
-    doodleDensity = 20;
-    sketchSlider.value = 60;
-    doodleDensitySlider.value = 20;
-    doodleToggle.classList.remove('active');
-    doodleOptions.classList.add('hidden');
-    document.querySelectorAll('.doodle-btn').forEach(btn => btn.classList.add('active'));
 
     // Reset AI state
     aiMode = false;
